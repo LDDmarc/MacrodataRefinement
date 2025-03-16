@@ -9,7 +9,7 @@ import SwiftUI
 
 extension NumbersView {
     enum Constants {
-        static let cellSize: CGFloat = 64
+        static let cellSize: CGFloat = 84
     }
 }
 
@@ -74,13 +74,13 @@ struct NumbersView: View {
             headerBorder
             HStack {
                 Text(viewModel.title)
-                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                    .font(.system(size: 36, weight: .bold, design: .rounded))
                     .foregroundColor(Color.lightBlue)
                     .lineLimit(1)
                 Spacer()
                 (Text(viewModel.fileProgress, format: .percent.precision(.significantDigits(1))) + Text(" Complete"))
                     .stroke(color: .lightBlue, width: 1)
-                    .font(.system(size: 28, weight: .bold))
+                    .font(.system(size: 34, weight: .bold))
                     .foregroundStyle(Color.darkBlue)
                     .lineLimit(1)
 
@@ -108,15 +108,15 @@ struct NumbersView: View {
 
     private var boxes: some View {
         VStack {
-            HStack(spacing: 30) {
+            HStack(spacing: 50) {
                 ForEach(viewModel.boxViewModels) { boxViewModel in
                     box(boxViewModel: boxViewModel)
                 }
             }
-            HStack(spacing: 30) {
+            HStack(spacing: 50) {
                 ForEach(Array(viewModel.boxProgresses.enumerated()), id: \.offset) { _, progress in
                     BoxProgressView(progress: progress)
-                        .frame(height: 20)
+                        .frame(height: 30)
                 }
             }
         }

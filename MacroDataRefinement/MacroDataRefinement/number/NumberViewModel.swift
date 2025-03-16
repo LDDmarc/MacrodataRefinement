@@ -14,7 +14,7 @@ final class NumberViewModel: Identifiable {
     let id = UUID()
 
     var font: Font {
-        .system(size: 20, weight: .bold, design: .default)
+        .system(size: 24, weight: .bold, design: .default)
     }
     var scale: CGFloat {
         switch state {
