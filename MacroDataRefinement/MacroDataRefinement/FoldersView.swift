@@ -17,10 +17,10 @@ struct Folder: Identifiable {
 
 @Observable
 final class FoldersViewModel {
-    var topFolders = ["Lorem", "Ipsum", "Dragon", "Consectetur"].map { Folder(name: $0) }
+    var topFolders = ["Lorem", "Ipsum", "Dragon", "Consectetur", "Afina", "Delta", "Harbour", "Wellington", "Barman", "Frida", "Simple", "America", "Prince"].map { Folder(name: $0) }
     var bottomFolders = [""].map { Folder(name: $0) }
 
-    private let animationDuration: TimeInterval = 1
+    private let animationDuration: TimeInterval = 0.3
 
     init() {
         topFolders[0].isOnTop = true
@@ -28,8 +28,8 @@ final class FoldersViewModel {
     }
 
     func flip() {
-        guard !topFolders.isEmpty else { return }
-        
+        guard topFolders.count > 1 else { return }
+
         withAnimation(.linear(duration: animationDuration)) {
             topFolders[safe: 1]?.isOnTop = true
             bottomFolders[safe: 0]?.isOnTop = false
@@ -55,17 +55,13 @@ struct FoldersView: View {
 
     @State var viewModel = FoldersViewModel()
 
-    private let offset: CGFloat = 10
-    private let distance: CGFloat = 20
+    private let offset: CGFloat = 6
     private let folderHeight: CGFloat = 100
 
     var body: some View {
         
         VStack(spacing: 0) {
-
-            test
-
-
+            folders
             Spacer(minLength: 200)
 
             Button("Animate") {
@@ -76,47 +72,44 @@ struct FoldersView: View {
         .background(Color.darkBlue)
     }
 
-    private var test: some View {
+    private var folders: some View {
         ZStack {
             VStack(spacing: 0) {
                 dummyFolders // top
-
-                dummyStaplers
 
                 if viewModel.bottomFolders.isEmpty {
                     dummyFolders
                 } else {
                     bottomFolders
+                        .rotation3DEffect(.degrees(180), axis: (x: 0, y: 0, z: 1))
                 }
             }
+            staplers
+            .frame(height: 0.1 * folderHeight)
 
             VStack(spacing: 0) {
                 topFolders
-
-                dummyStaplers
                 dummyFolders // bottom
             }
 
-            staplers
         }
     }
 
     private var staplers: some View {
         HStack(spacing: 100) {
-            RoundedRectangle(cornerRadius: 5)
+            UnevenRoundedRectangle(cornerRadii: .init(
+                topLeading: 4, topTrailing: 4
+            ))
                 .fill(Color.lightBlue)
-                .frame(width: 8, height: distance * 2)
+                .frame(width: 8)
 
 
-            RoundedRectangle(cornerRadius: 5)
+            UnevenRoundedRectangle(cornerRadii: .init(
+                topLeading: 4, topTrailing: 4
+            ))
                 .fill(Color.lightBlue)
-                .frame(width: 8, height: distance * 2)
+                .frame(width: 8)
         }
-    }
-
-    private var dummyStaplers: some View {
-        Spacer()
-            .frame(height: distance)
     }
 
     private var dummyFolders: some View {
@@ -137,10 +130,49 @@ struct FoldersView: View {
                         anchor: .bottom,
                         perspective: 0.1
                     )
-                    .offset(y: _folder.isAnimating ? distance : 0)
             }
         }
     }
+
+    private var bottomFolders: some View {
+        ZStack {
+            ForEach(Array(viewModel.bottomFolders.reversed().enumerated()), id: \.offset) { ind, _folder in
+                folder(_folder, fillColor: .purple)
+                    .offset(y: _folder.isOnTop ? 0 : -offset)
+            }
+        }
+    }
+
+
+    private func folder(_ folder: Folder, fillColor: Color = .red) -> some View {
+        VStack(spacing: -0.1 * folderHeight) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(Color.darkBlue)
+                    .stroke(Color.lightBlue, lineWidth: 2)
+                    .frame(width: 150, height: 0.93 * folderHeight)
+                Text(folder.name)
+                    .foregroundColor(.lightBlue)
+                    .opacity(folder.isTextVisible ? 1 : 0)
+            }
+
+            staplers
+        }
+        .frame(width: 150, height: folderHeight)
+    }
+
+    private var wheel: some View {
+        VStack {
+            
+        }
+    }
+}
+
+#Preview {
+    FoldersView()
+        .frame(height: 500)
+}
+
 
 //    private var topFolders: some View {
 //        ZStack {
@@ -169,31 +201,3 @@ struct FoldersView: View {
 //            }
 //        }
 //    }
-
-    private var bottomFolders: some View {
-        ZStack {
-            ForEach(Array(viewModel.bottomFolders.reversed().enumerated()), id: \.offset) { ind, _folder in
-                folder(_folder, fillColor: .green)
-                    .offset(y: _folder.isOnTop ? 0 : offset)
-            }
-        }
-    }
-
-
-    private func folder(_ folder: Folder, fillColor: Color = .red) -> some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 2)
-                .fill(Color.darkBlue)
-                .stroke(Color.lightBlue, lineWidth: 3)
-            Text(folder.name)
-                .foregroundColor(.lightBlue)
-                .opacity(folder.isTextVisible ? 1 : 0)
-        }
-        .frame(width: 150, height: folderHeight)
-    }
-}
-
-#Preview {
-    FoldersView()
-        .frame(height: 600)
-}
