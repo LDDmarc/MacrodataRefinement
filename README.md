@@ -6,6 +6,7 @@ A SwiftUI pet project inspired by Apple TV series [Severance](https://tv.apple.c
 
 https://github.com/user-attachments/assets/d50c6bd8-bec0-430a-a9b6-cd2cf41a1974
 
+https://github.com/user-attachments/assets/10c6727a-e785-4b1e-930e-fb00acdf3c80
 
 ## Features & Technical Details
 
@@ -13,3 +14,7 @@ https://github.com/user-attachments/assets/d50c6bd8-bec0-430a-a9b6-cd2cf41a1974
 - Each number is floating randomly in horizontal or vertical direction. 
 - For numbers selection I use `.onHover` and `DragGesture`
 - For older look `.overlay` with pixels grid immitation is used. 
+
+- ZStack with shifts for Folders animation
+- x^2 and (x+1)^2 functions for Wheel View
+- 3D rotation with 0.0 perspective
