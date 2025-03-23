@@ -9,7 +9,13 @@ import SwiftUI
 
 struct Folder: Identifiable {
     enum State: Equatable {
-        case hidden, presented(isOnTop: Bool), flipping, flipped(isOnTop: Bool)
+        case faced(Position), flipping, flipped(Position)
+
+        enum Position {
+            case onTop
+            case second
+            case hidden
+        }
     }
 
     struct Letter {
@@ -23,10 +29,13 @@ struct Folder: Identifiable {
     var state: State
     let letter: Letter?
     var isTextVisible: Bool
-    var isVisible: Bool {
-        state != .hidden
-    }
 
+    var isVisible: Bool {
+        switch state {
+        case .faced(let position), .flipped(let position): position != .hidden
+        case .flipping: true
+        }
+    }
     var isFlipping: Bool {
         state == .flipping
     }
@@ -38,12 +47,8 @@ struct Folder: Identifiable {
     }
     var isOnTop: Bool {
         switch state {
-        case .presented(let isOnTop), .flipped(let isOnTop):
-            return isOnTop
-        case .flipping:
-            return true
-        case .hidden:
-            return false
+        case .faced(let position), .flipped(let position): position == .onTop
+        case .flipping: true
         }
     }
 
@@ -56,8 +61,8 @@ struct Folder: Identifiable {
 
     mutating func moveToTop() {
         switch state {
-        case .presented:
-            state = .presented(isOnTop: true)
+        case .faced:
+            state = .faced(.onTop)
         default:
             break
         }
@@ -66,7 +71,7 @@ struct Folder: Identifiable {
     mutating func moveToBottom() {
         switch state {
         case .flipped:
-            state = .flipped(isOnTop: false)
+            state = .flipped(.second)
         default:
             break
         }
@@ -80,20 +85,20 @@ final class FoldersViewModel {
     private(set) var bottomFolders = [Folder]()
     let wheelViewModel = WheelViewModel()
 
-    private let animationDuration: TimeInterval = 1.4
+    private let animationDuration: TimeInterval = 0.4
 
     init() {
         fillFolders()
     }
 
     func flip() {
-        guard topFolders.count > 1 else { return }
+        guard topFolders[0].name != "Cold Harbor" else { return }
 
         withAnimation(.easeIn(duration: animationDuration)) {
             topFolders[safe: 1]?.moveToTop()
-            topFolders[safe: 2]?.state = .presented(isOnTop: false)
+            topFolders[safe: 2]?.state = .faced(.second)
             bottomFolders[safe: 0]?.moveToBottom()
-            bottomFolders[safe: 1]?.state = .hidden
+            bottomFolders[safe: 1]?.state = .flipped(.hidden)
             topFolders[safe: 0]?.state = .flipping
             wheelViewModel.move()
             
@@ -102,14 +107,14 @@ final class FoldersViewModel {
                 return
             }
             var flippedFolder = topFolders[0]
-            flippedFolder.state = .flipped(isOnTop: true)
+            flippedFolder.state = .flipped(.onTop)
             bottomFolders.insert(flippedFolder, at: 0)
             topFolders.remove(at: 0)
 
             flip()
         }
 
-        withAnimation(.linear(duration: animationDuration / 2)) {
+        withAnimation(.linear(duration: animationDuration / 2).delay(animationDuration / 3)) {
             topFolders[safe: 0]?.isTextVisible = false
         }
     }
@@ -123,7 +128,21 @@ private extension FoldersViewModel {
     func fillFolders() {
         var firstLetter: String?
         var letterIndex = -1
-        topFolders = ["Lorem", "Dragon", "Consectetur", "Afina", "Delta", "Cold Harbour", "Wellington", "Barman", "Frida", "Abracadabra", "America", "Linda"]
+        topFolders = [
+            "Adelaide",
+            "Allentown",
+            "Astoria",
+            "Billings",
+            "Boda",
+            "Cairnes",
+            "Cold Harbor",
+            "Dranesville",
+            "Eau Claire",
+            "Eminence",
+            "Erie",
+            "Fort Dodge",
+            "Gold Coast",
+        ]
             .sorted()
             .reduce(into: [Folder](), { partialResult, room in
                 if
@@ -134,24 +153,24 @@ private extension FoldersViewModel {
                     letterIndex += 1
                     partialResult.append(Folder(
                         name: "",
-                        state: .hidden,
+                        state: .faced(.hidden),
                         letter: .init(letter: firstLetter ?? "", index: letterIndex),
                         isTextVisible: true
                     ))
                 }
                 partialResult.append(Folder(
                     name: room,
-                    state: .hidden,
+                    state: .faced(.hidden),
                     letter: nil,
                     isTextVisible: true
                 ))
             })
-        topFolders[safe: 0]?.state = .presented(isOnTop: true)
+        topFolders[safe: 0]?.state = .faced(.onTop)
         for ind in 1..<2 {
-            topFolders[safe: ind]?.state = .presented(isOnTop: false)
+            topFolders[safe: ind]?.state = .faced(.second)
         }
 
-        bottomFolders.append(Folder(name: "", state: .flipped(isOnTop: true), letter: nil, isTextVisible: false))
+        bottomFolders.append(Folder(name: "", state: .flipped(.onTop), letter: nil, isTextVisible: false))
     }
 
 }

@@ -15,25 +15,30 @@ struct Test: View {
     var body: some View {
         VStack {
             Spacer(minLength: 150)
-            ZStack {
-                ForEach(0..<colors.count) { index in
-                    let ind = colors.count - index - 1
-                    Rectangle()
-                        .fill(colors[index])
-                        .frame(width: 200, height: 100)
-                        .rotation3DEffect(
-                            .degrees(-10 * Double(ind)),
-                            axis: (x: 1, y: 0, z: 0),
-                            anchor: .bottom,
-                            perspective: 0.0
-                        )
-                }
-
-            }
+//            ZStack {
+//                ForEach(0..<colors.count) { index in
+//                    let ind = colors.count - index - 1
+//                    Rectangle()
+//                        .fill(colors[index])
+//                        .frame(width: 200, height: 100)
+//                        .rotation3DEffect(
+//                            .degrees(-10 * Double(ind)),
+//                            axis: (x: 1, y: 0, z: 0),
+//                            anchor: .bottom,
+//                            perspective: 0.1
+//                        )
+//                }
+//
+//            }
 ////            shapedText
 ////                .rotation3DEffect(.degrees(rotate ? -30 : 0), axis: (x: 1, y: 0, z: 0), anchor: .top, perspective: 1)
-//            shapedText
-//                .rotation3DEffect(.degrees(rotate ? -30 : 0), axis: (x: 1, y: 0, z: 0), anchor: .bottom, perspective: 0)
+            shapedText
+                .rotation3DEffect(
+                    .degrees(rotate ? -40 : 0),
+                    axis: (x: 1, y: 0, z: 0),
+                    anchor: .top,
+                    perspective: 0.3
+                )
             Spacer(minLength: 250)
             Button("Rotate") {
                 withAnimation(.linear(duration: 1)) {

@@ -11,7 +11,8 @@ import SwiftUI
 struct MacroDataRefinementApp: App {
     var body: some Scene {
         WindowGroup {
-            NumbersView()
+//            NumbersView()
+            FoldersView()
         }
     }
 }

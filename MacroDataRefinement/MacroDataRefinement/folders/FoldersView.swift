@@ -2,7 +2,7 @@
 //  FoldersView.swift
 //  MacroDataRefinement
 //
-//  Created by Дарья Леонова on 16.03.2025.
+//  Created by Daria Leonova on 16.03.2025.
 //
 
 import SwiftUI
@@ -11,9 +11,6 @@ struct FoldersView: View {
 
     @State var viewModel = FoldersViewModel()
 
-    private let offset: CGFloat = 0
-    private let folderHeight: CGFloat = 120
-
     var body: some View {
         VStack(spacing: 0) {
             HStack {
@@ -21,8 +18,8 @@ struct FoldersView: View {
                 folders
                 wheel
             }
-            Spacer(minLength: 200)
 
+            Spacer(minLength: 200)
             Button("Animate") {
                 viewModel.flip()
             }
@@ -45,9 +42,9 @@ struct FoldersView: View {
                     dummyFolders
                 } else {
                     bottomFolders
-                        .rotation3DEffect(.degrees(180), axis: (x: 0, y: 0, z: 1))
                 }
             }
+
             staplers
             .frame(height: 0.1 * folderHeight)
 
@@ -55,7 +52,6 @@ struct FoldersView: View {
                 topFolders
                 dummyFolders // bottom
             }
-
         }
     }
 
@@ -80,59 +76,40 @@ struct FoldersView: View {
             ForEach(Array(
                 viewModel
                     .topFolders
-                    .reversed().enumerated()
+                    .reversed()
+                    .enumerated()
             ), id: \.offset) { ind, _folder in
-                let index = viewModel.topFolders.count - 1 - ind
-                let isBackwards = index > 1
-
+                let angle = _folder.isFlipping ? -180.0 : (_folder.isVisible ? 0.0 : 40.0)
                 return folder(_folder)
                     .rotation3DEffect(
-                        .degrees(isBackwards ? 10 * Double(index) : -10 * Double(index)),
+                        .degrees(angle),
                         axis: (x: 1, y: 0, z: 0),
                         anchor: .bottom,
-                        perspective: isBackwards ? 1 : 0.1
+                        perspective: 0
                     )
             }
         }
     }
 
-
-//    private var topFolders: some View {
-//        ZStack {
-//            ForEach(Array(
-//                viewModel
-//                    .topFolders
-//                    .reversed().enumerated()
-//            ), id: \.offset) { ind, _folder in
-//                if _folder.isVisible {
-//                    folder(_folder)
-//                        .rotation3DEffect(
-//                            .degrees(_folder.isFlipping ?  -180.0 : 0),
-//                            axis: (x: 1, y: 0, z: 0),
-//                            anchor: .bottom,
-//                            perspective: 0.1
-//                        )
-//                        .transition(.offset(y: 40))
-//                }
-//            }
-//        }
-//    }
-
     private var bottomFolders: some View {
         ZStack {
-            ForEach(Array(viewModel.bottomFolders.reversed().enumerated()), id: \.offset) { ind, _folder in
-//                if _folder.isVisible {
-//                    folder(_folder)                        .transition(.offset(y: offset))
-//                }
-                folder(_folder)
-//                    .rotation3DEffect(
-//                        .degrees(-2 * Double(viewModel.bottomFolders.count - 1 - ind)),
-//                        axis: (x: 1, y: 0, z: 0),
-//                        anchor: .bottom,
-//                        perspective: 0.1
-//                    )
+            ForEach(Array(
+                viewModel
+                    .bottomFolders
+                    .reversed()
+                    .enumerated()
+            ), id: \.offset) { ind, _folder in
+                let angle = _folder.isVisible ? 0.0 : 40.0
+                return folder(_folder)
+                    .rotation3DEffect(
+                        .degrees(angle),
+                        axis: (x: 1, y: 0, z: 0),
+                        anchor: .bottom,
+                        perspective: 0.1
+                    )
             }
         }
+        .rotation3DEffect(.degrees(180), axis: (x: 0, y: 0, z: 1))
     }
 
     private func folderLetter(_ folder: Folder, shift: Double) -> some View {
@@ -141,7 +118,7 @@ struct FoldersView: View {
             if !folder.isFlipped { _shift }
             Text(folder.letter?.letter ?? " ")
                 .foregroundColor(.darkBlue)
-                .font(.title2)
+                .font(.title2.weight(.medium))
                 .opacity(folder.isTextVisible ? 1 : 0)
                 .padding(.top, 0)
                 .padding(.bottom, 2)
@@ -160,7 +137,7 @@ struct FoldersView: View {
         VStack(spacing: -0.15 * folderHeight) {
             ZStack {
                 VStack(alignment: !folder.isFlipped ? .leading : .trailing, spacing: -1.0) {
-                    folderLetter(folder, shift: 10 * Double(folder.letter?.index ?? 0))
+                    folderLetter(folder, shift: 30 * Double((folder.letter?.index ?? 0) % 4))
                         .zIndex(1)
                     RoundedRectangle(cornerRadius: 2)
                         .fill(Color.darkBlue)
@@ -169,8 +146,10 @@ struct FoldersView: View {
                 .frame(height: 0.93 * folderHeight)
 
                 Text(folder.name)
+                    .font(.title)
                     .foregroundColor(.lightBlue)
                     .opacity(folder.isTextVisible ? 1 : 0)
+                    .offset(y: 8)
             }
 
             staplers
@@ -179,10 +158,10 @@ struct FoldersView: View {
         .offset(y: folder.isOnTop ? 0 : -offset)
     }
 
+    private let offset: CGFloat = 6
+    private let folderHeight: CGFloat = 120
 }
 
 #Preview {
     FoldersView()
-//        .scaleEffect(2.99)
-        .frame(width: 400, height: 500)
 }
